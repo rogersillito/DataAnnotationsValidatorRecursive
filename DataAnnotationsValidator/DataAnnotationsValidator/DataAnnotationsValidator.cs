@@ -32,7 +32,7 @@ namespace DataAnnotationsValidator
 				var asEnumerable = value as IEnumerable;
 				if (asEnumerable != null)
 				{
-				    result = TryValidateEnumerableObjectRecursive<T>(asEnumerable, results, validationContextItems, result, property.Name);
+				    result = TryValidateEnumerableObjectRecursive(asEnumerable, results, validationContextItems, result, property.Name);
 				}
 				else
 				{
@@ -52,25 +52,23 @@ namespace DataAnnotationsValidator
 			var objAsEnumerable = obj as IEnumerable;
 			if (objAsEnumerable != null)
 			{
-			    result = TryValidateEnumerableObjectRecursive<T>(objAsEnumerable, results, validationContextItems, result, "{root}");
+			    result = TryValidateEnumerableObjectRecursive(objAsEnumerable, results, validationContextItems, result, "{root}");
 			}
 
 			return result;
 		}
 
-		private bool TryValidateEnumerableObjectRecursive<T>(IEnumerable enumerableObject, List<ValidationResult> results,
-				IDictionary<object, object> validationContextItems, bool isValid, string parentPropertyName)
+		private bool TryValidateEnumerableObjectRecursive(IEnumerable enumerableObject, List<ValidationResult> results, IDictionary<object, object> validationContextItems, bool isValid, string parentPropertyName)
 		{
 			foreach (var enumObj in enumerableObject)
 			{
 				var nestedResults = new List<ValidationResult>();
-				if (!TryValidateObjectRecursive<object>(enumObj, nestedResults, validationContextItems))
+				if (!TryValidateObjectRecursive(enumObj, nestedResults, validationContextItems))
 				{
 					isValid = false;
 					foreach (var validationResult in nestedResults)
 					{
-						results.Add(new ValidationResult(validationResult.ErrorMessage,
-								validationResult.MemberNames.Select(x => parentPropertyName + '.' + x)));
+						results.Add(new ValidationResult(validationResult.ErrorMessage, validationResult.MemberNames.Select(x => parentPropertyName + '.' + x)));
 					}
 				}
 			}
