@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using NUnit.Framework;
@@ -95,6 +96,26 @@ namespace DataAnnotationsValidator.Tests
 			Assert.IsFalse(result);
 			Assert.AreEqual(1, validationResults.Count);
 			Assert.AreEqual("Child PropertyA and PropertyB cannot add up to more than 10", validationResults[0].ErrorMessage);
+		}
+
+		[Test]
+		public void TryValidateObjectRecursive_returns_errors_from_contained_objects_when_root_object_is_enumerable()
+		{
+			Func<Parent> newObjGraphWith1InvalidProp = () =>
+			{
+				var parent = new Parent { PropertyA = 1, PropertyB = 1 };
+				parent.Child = new Child { PropertyA = 1, PropertyB = 1 };
+				parent.Child.GrandChildren = new [] {new GrandChild{PropertyA = 1, PropertyB = 11}};
+				return parent;
+			};
+			var parentList = Enumerable.Range(1, 4).Select(x => newObjGraphWith1InvalidProp()).ToList();
+			var validationResults = new List<ValidationResult>();
+
+			var result = _validator.TryValidateObjectRecursive(parentList, validationResults);
+
+			Assert.IsFalse(result);
+			Assert.AreEqual(4, validationResults.Count);
+			Assert.AreEqual(4, validationResults.Count(x => x.ErrorMessage == "GrandChild PropertyB not within range"));
 		}
 
 		[Test]
