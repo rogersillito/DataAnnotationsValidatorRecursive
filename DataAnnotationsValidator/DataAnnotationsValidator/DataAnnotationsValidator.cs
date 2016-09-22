@@ -52,13 +52,13 @@ namespace DataAnnotationsValidator
 			var objAsEnumerable = obj as IEnumerable;
 			if (objAsEnumerable != null)
 			{
-			    result = TryValidateEnumerableObjectRecursive(objAsEnumerable, results, validationContextItems, result, "{root}");
+			    result = TryValidateEnumerableObjectRecursive(objAsEnumerable, results, validationContextItems, result);
 			}
 
 			return result;
 		}
 
-		private bool TryValidateEnumerableObjectRecursive(IEnumerable enumerableObject, List<ValidationResult> results, IDictionary<object, object> validationContextItems, bool isValid, string parentPropertyName)
+		private bool TryValidateEnumerableObjectRecursive(IEnumerable enumerableObject, List<ValidationResult> results, IDictionary<object, object> validationContextItems, bool isValid, string parentPropertyName = "")
 		{
 			foreach (var enumObj in enumerableObject)
 			{
